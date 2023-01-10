@@ -2,10 +2,13 @@ import sys, time, msvcrt
 import time
 
 def playfieldbackground():
-    #ORIGINAL = u'\u2591' , blank = ' '  (remember to change backgroundsymbol in playerline aswell if you want a matching line behind the bottom bar)
+    global backgroundsymbol
+    #ORIGINAL = u'\u2591' , blank = ' '
     backgroundsymbol = u'\u2591'
     #PLAYFIELDLINE MAX VALUE = [u'\u2591']*115
-    playfieldline = [backgroundsymbol]*18
+    global playfieldlinelen
+    playfieldlinelen = 18
+    playfieldline = [backgroundsymbol]*playfieldlinelen
     #PLAYGIELD HEIGHT DEFINED BY NUMBER OF LINES, OPTIMAL VALUE IS = [u'\u2591']*6, MAXIMAL VALUE IS = [u'\u2591']*28
     playfield = ['']*6
 
@@ -20,6 +23,15 @@ def playfieldbackground():
 def displaycmd(playfield):
     #strplayfield = ['placeholder spot 0']
     #strcounter = 1
+
+    # test
+    for x in playfield:
+        print(x)
+    # test
+
+
+
+
 
     # SCREENTEARING ISSUE
     print('\n\n\n\n\n\n')
@@ -59,8 +71,6 @@ def characterupdate(playfield, direction):
     charactersymbol = u'\u2588'
     #MINIMUM VALUE = 1
     charactersize = 5
-    #ORIGINAL VALUE = u'\u2591', FOR BLANK = ' ' 
-    backgroundsymbol = u'\u2591'
 
     # Sætter sidste linje i araet som spillerens position
     activelineofplayer = len(playfield) - 1
@@ -142,72 +152,67 @@ def characterupdate(playfield, direction):
 
 def ballupdate(playfield):
     #ORIGINAL VALUE = u'\u2588'
+    global ballalive
     ballsymbol = u'\u03BF'
-    i = 0
-    ballalive = False
     balldirection = 'upright'
     
-
-
-    while i < len(playfield):
-        if playfield[i] == ballsymbol:
-            ballalive = True
-        i += 1
-
+    for x in playfield:
+        for y in x:
+            if y != ballsymbol:
+                ballalive = False
     if ballalive == False:
-        #create ball location
-        playfield[-2][0] = ballsymbol
-
-        balldirection = 'upright'
-
-    elif ballalive == True:
-
+        playfield[-2] = [ballsymbol]
         i = 0
-        for i in range(len(playfield)):
-            if playfield[i] == ballsymbol:
-                
-                
-                playfield[i].index(ballsymbol)
-                balllocation = [i, playfield[i].index(ballsymbol)]
-                movementupdate(playfield, balldirection, balllocation)
-
-                #ball direction change if object on top
-            
-                #ball direction change if object on right
-                #ball direction change if object on bottom
-                
-                #ball direction change if object on left
-            else:
-                print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC'                               )
+        while i < playfieldlinelen - 1:
+            playfield[-2].append(backgroundsymbol)
+            i += 1
+        
+    i = -1
+    for x in playfield:
+        i += 1
+        for y in x:
+            if y == ballsymbol:
+                ballalive = True
+                ballpositionvertical = i
+                ballpositionhorizontal = x.index(ballsymbol)
+                break
+    print(ballpositionvertical, ballpositionhorizontal)
 
 
+
+    # detect collision and update placement of the ball dependent on direction
+    if ballalive == True:
+        movementupdate(playfield, balldirection, ballpositionvertical, ballpositionhorizontal)
+    print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC'                               )
     return(playfield)
 
         
-def movementupdate(playfield, balldirection, balllocation):
+def movementupdate(playfield, balldirection, ballpositionvertical, ballpositionhorizontal):
+    #detect collision and update direction of ball
+
+
+
+    #update placement of ball dependent on direction
     if balldirection == 'upright':
-        print(balllocation)
-        verticallocation = balllocation[0]
-        verticallocation -= 1
-        horizontallocation = balllocation[1]
-        horizontallocation += 1
-
-        balllocation[0] = verticallocation
-        balllocation[1] = horizontallocation
-        balllocationspot = playfield[verticallocation]
-        balllocationspot = balllocationspot[horizontallocation]
-
-
-        for i in range(len(playfield)):
-            playfieldline = playfield[i]
+    
+    #UNDER CONSTRUCTION
+        playfield[ballpositionvertical - 1]
+        print(playfield[ballpositionvertical - 1])
+        i = 0
+        for i in playfield[ballpositionvertical - 1]:
+            i += 1
+            if i == ballpositionvertical:
+                print('i: ', i)
+                tall = playfield[i]
 
 
-
-
-
-
-
-    balllocation
+        print('ball going up and right')
+    if balldirection == 'downright':
+        print('ball going down and right')
+    if balldirection == 'upleft':
+        print('ball going up and left')
+    if balldirection == 'downleft':
+        print('ball going down and left')
     
 
 
