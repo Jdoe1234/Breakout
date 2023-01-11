@@ -152,37 +152,39 @@ def characterupdate(playfield, direction):
 
 def ballupdate(playfield):
     #ORIGINAL VALUE = u'\u2588'
-    global ballalive
+    global ballsymbol
     ballsymbol = u'\u03BF'
     balldirection = 'upright'
-    
+    ballalive = False
+
+    # checks if the ball symbol is already on the playingfield
+    # taking each individuel line in playfield and assigns them to x, counting times loop is running to locate playfield[0]
+    i = - 1
     for x in playfield:
+        i += 1
+        # takes each indvidual varaible of each individual line and assign them to y
         for y in x:
-            if y != ballsymbol:
-                ballalive = False
+            # checks each individual variable if it is the symbol of the ball, if the ball is found, location is stored as "[playfield[], playfieldline[]]"
+            if y == ballsymbol:
+                ballalive = True
+                ballpositionvertical = i
+                ballpositionhorizontal = x.index(ballsymbol)
+                break
+
+    # creating a ball at its spawn location if there is no ballsymbol detected on the playingfield
     if ballalive == False:
         playfield[-2] = [ballsymbol]
         i = 0
         while i < playfieldlinelen - 1:
             playfield[-2].append(backgroundsymbol)
             i += 1
-        
-    i = -1
-    for x in playfield:
-        i += 1
-        for y in x:
-            if y == ballsymbol:
-                ballalive = True
-                ballpositionvertical = i
-                ballpositionhorizontal = x.index(ballsymbol)
-                break
-    print(ballpositionvertical, ballpositionhorizontal)
 
-
-
-    # detect collision and update placement of the ball dependent on direction
+    #if ball is present, cordinates are send to functions needing location
     if ballalive == True:
+        print(ballpositionvertical, ballpositionhorizontal)
+    # detect collision and update placement of the ball dependent on direction
         movementupdate(playfield, balldirection, ballpositionvertical, ballpositionhorizontal)
+
     print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC'                               )
     return(playfield)
 
@@ -190,20 +192,30 @@ def ballupdate(playfield):
 def movementupdate(playfield, balldirection, ballpositionvertical, ballpositionhorizontal):
     #detect collision and update direction of ball
 
-
-
-    #update placement of ball dependent on direction
-    if balldirection == 'upright':
     
     #UNDER CONSTRUCTION
-        playfield[ballpositionvertical - 1]
-        print(playfield[ballpositionvertical - 1])
-        i = 0
-        for i in playfield[ballpositionvertical - 1]:
+
+    #update placement of ball dependent on direction
+    if balldirection == 'upright':  
+        # place ball at new location
+        i = -1
+        temporaryplayfieldline = []
+        for playfieldline in playfield:
             i += 1
-            if i == ballpositionvertical:
-                print('i: ', i)
-                tall = playfield[i]
+            if i == ballpositionvertical - 1:
+                for ii in range(len(playfieldline)):
+                #alters horizontal position of ball: "-" equels 1 left, "+" equals 1 right
+                    if ii < ballpositionhorizontal + 1:
+                        temporaryplayfieldline.insert(0, backgroundsymbol)
+                    if ii == ballpositionhorizontal:
+                        temporaryplayfieldline.append(ballsymbol)
+                    # all lines need " and ii == backgroundsymbol " when testing is over
+                    if ii > ballpositionhorizontal + 1:
+                        temporaryplayfieldline.append(backgroundsymbol)
+                playfield[i] = temporaryplayfieldline
+
+
+
 
 
         print('ball going up and right')
@@ -214,8 +226,23 @@ def movementupdate(playfield, balldirection, ballpositionvertical, ballpositionh
     if balldirection == 'downleft':
         print('ball going down and left')
     
+    
+    
+    # replaces(removes) ball from prevoious location
+    i = -1
+    for playfieldline in playfield:
+        # i is the number of current playfield list in int passes from 0 to 5
+        # playfieldline is the actual list
+        i += 1
+        if i == ballpositionvertical:
+            # ii is the variable in the current list of playfieldline, loop is needed to detect if ii is a certain object
+            for ii in range(len(playfieldline)):
+                if ii == ballpositionhorizontal and i == ballpositionvertical:
+                    playfieldline[ii] = 'x'
+                    playfield[i-1] = temporaryplayfieldline       
+             
 
-
+    
     return(playfield)
     
 
@@ -235,7 +262,7 @@ def main ():
     direction = ''        
 
     i = 0
-    while i < 3:
+    while i < 10:
         i += 1
 
 
