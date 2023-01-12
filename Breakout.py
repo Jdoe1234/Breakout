@@ -67,6 +67,7 @@ def displaycmd(playfield):
 
 
 def characterupdate(playfield, direction):
+    global charactersymbol
     #ORIGINAL VALUE = u'\u2588'
     charactersymbol = u'\u2588'
     #MINIMUM VALUE = 1
@@ -199,8 +200,10 @@ def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
 
     
     #detect collision      MISSING
-    if ballpositionvertical == len(playfield) - 2: # ADDD " and "player below = True" "
+    
+    if playfield[-1][ballpositionhorizontal] == charactersymbol and ballpositionvertical == len(playfield) - 2:
         balldirection[0] = 'n'
+
 
     #update direction of ball      MISSING
     if ballpositionhorizontal == playfieldlinelen - 1:
