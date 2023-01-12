@@ -90,7 +90,9 @@ def characterupdate(playfield, direction):
         while i < len(playfield[0]):
             playfield[activelineofplayer].append(backgroundsymbol) 
             i += 1
-            
+
+        
+        print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC',       '         character spawned'                        )    
         return(playfield)  
         
         
@@ -154,7 +156,6 @@ def ballupdate(playfield):
     #ORIGINAL VALUE = u'\u2588'
     global ballsymbol
     ballsymbol = u'\u03BF'
-    balldirection = 'upright'
     ballalive = False
 
     # checks if the ball symbol is already on the playingfield
@@ -173,62 +174,143 @@ def ballupdate(playfield):
 
     # creating a ball at its spawn location if there is no ballsymbol detected on the playingfield
     if ballalive == False:
-        playfield[-2] = [ballsymbol]
+        print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC',       '         ball spawned'                        )
+        playfield[-3] = [ballsymbol]
         i = 0
         while i < playfieldlinelen - 1:
-            playfield[-2].append(backgroundsymbol)
+            playfield[-3].append(backgroundsymbol)
             i += 1
+        global balldirection
+        balldirection = ['n', 'e']
+        
 
     #if ball is present, cordinates are send to functions needing location
     if ballalive == True:
-        print(ballpositionvertical, ballpositionhorizontal)
+        print('ballposition cord: ', ballpositionvertical, ballpositionhorizontal)
     # detect collision and update placement of the ball dependent on direction
-        movementupdate(playfield, balldirection, ballpositionvertical, ballpositionhorizontal)
+        movementupdate(playfield, ballpositionvertical, ballpositionhorizontal)
 
-    print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC'                               )
     return(playfield)
 
         
-def movementupdate(playfield, balldirection, ballpositionvertical, ballpositionhorizontal):
-    #detect collision and update direction of ball
+def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
+
+
 
     
-    #UNDER CONSTRUCTION
+    #detect collision      MISSING
+    if ballpositionvertical == len(playfield) - 2: # ADDD " and "player below = True" "
+        balldirection[0] = 'n'
+
+    #update direction of ball      MISSING
+    if ballpositionhorizontal == playfieldlinelen - 1:
+        balldirection[1] = 'w'
+        print('moving bk west')
+
+    #   NOT WORKING
+    if ballpositionvertical == len(playfield) - 1:
+        print('you lost')
+        # currently respawns player because of load order, overwriting ball, meaning a new ball gets spawned aswell as it is loaded afterwards
+
+    if ballpositionhorizontal == 0:
+        balldirection[1] = 'e'
+        print('moving bk east')
+
+    if ballpositionvertical == 0:
+        balldirection[0] = 's'
+        print('moving bk south')
+    
+    
+
+
+    
+
+    
+    # CODE CAN PROBABLY BE SHORTEND (pack all into 1 loop)
 
     #update placement of ball dependent on direction
-    if balldirection == 'upright':  
-        # place ball at new location
+    print('balldirection: ', balldirection)
+    if balldirection[0] == 'n' and balldirection[1] == 'e':  
+        print('ball going up and right')
         i = -1
         temporaryplayfieldline = []
         for playfieldline in playfield:
             i += 1
+            #alters vertical position of ball: "-" equels up, "+" equals down
             if i == ballpositionvertical - 1:
                 for ii in range(len(playfieldline)):
-                #alters horizontal position of ball: "-" equels 1 left, "+" equals 1 right
+                #alters horizontal position of ball: "-" equels left, "+" equals right
                     if ii < ballpositionhorizontal + 1:
                         temporaryplayfieldline.insert(0, backgroundsymbol)
                     if ii == ballpositionhorizontal:
                         temporaryplayfieldline.append(ballsymbol)
-                    # all lines need " and ii == backgroundsymbol " when testing is over
                     if ii > ballpositionhorizontal + 1:
                         temporaryplayfieldline.append(backgroundsymbol)
                 playfield[i] = temporaryplayfieldline
+                break
 
-
-
-
-
-        print('ball going up and right')
-    if balldirection == 'downright':
+    if balldirection[0] == 's' and balldirection[1] == 'e':  
         print('ball going down and right')
-    if balldirection == 'upleft':
+        i = -1
+        temporaryplayfieldline = []
+        for playfieldline in playfield:
+            i += 1
+            #alters vertical position of ball: "-" equels up, "+" equals down
+            if i == ballpositionvertical + 1:
+                for ii in range(len(playfieldline)):
+                #alters horizontal position of ball: "-" equels left, "+" equals right
+                    if ii < ballpositionhorizontal + 1:
+                        temporaryplayfieldline.insert(0, backgroundsymbol)
+                    if ii == ballpositionhorizontal:
+                        temporaryplayfieldline.append(ballsymbol)
+                    if ii > ballpositionhorizontal + 1:
+                        temporaryplayfieldline.append(backgroundsymbol)
+                playfield[i] = temporaryplayfieldline
+                break
+
+    if balldirection[0] == 'n' and balldirection[1] == 'w':  
         print('ball going up and left')
-    if balldirection == 'downleft':
+        i = -1
+        temporaryplayfieldline = []
+        for playfieldline in playfield:
+            i += 1
+            #alters vertical position of ball: "-" equels up, "+" equals down
+            if i == ballpositionvertical - 1:
+                for ii in range(len(playfieldline)):
+                #alters horizontal position of ball: "-" equels left, "+" equals right
+                    if ii < ballpositionhorizontal - 1:
+                        temporaryplayfieldline.insert(0, backgroundsymbol)
+                    if ii == ballpositionhorizontal:
+                        temporaryplayfieldline.append(ballsymbol)
+                    if ii > ballpositionhorizontal - 1:
+                        temporaryplayfieldline.append(backgroundsymbol)
+                playfield[i] = temporaryplayfieldline
+                break
+
+    if balldirection[0] == 's' and balldirection[1] == 'w':  
         print('ball going down and left')
+        i = -1
+        temporaryplayfieldline = []
+        for playfieldline in playfield:
+            i += 1
+            #alters vertical position of ball: "-" equels up, "+" equals down
+            if i == ballpositionvertical + 1:
+                for ii in range(len(playfieldline)):
+                #alters horizontal position of ball: "-" equels left, "+" equals right
+                    if ii < ballpositionhorizontal - 1:
+                        temporaryplayfieldline.insert(0, backgroundsymbol)
+                    if ii == ballpositionhorizontal:
+                        temporaryplayfieldline.append(ballsymbol)
+                    if ii > ballpositionhorizontal - 1:
+                        temporaryplayfieldline.append(backgroundsymbol)
+                playfield[i] = temporaryplayfieldline
+                break
     
-    
-    
-    # replaces(removes) ball from prevoious location
+
+    #updating ball position regardles of direction
+    playfield[i] = temporaryplayfieldline       
+
+    # replaces(removes) ball from prevoious location   
     i = -1
     for playfieldline in playfield:
         # i is the number of current playfield list in int passes from 0 to 5
@@ -238,12 +320,11 @@ def movementupdate(playfield, balldirection, ballpositionvertical, ballpositionh
             # ii is the variable in the current list of playfieldline, loop is needed to detect if ii is a certain object
             for ii in range(len(playfieldline)):
                 if ii == ballpositionhorizontal and i == ballpositionvertical:
-                    playfieldline[ii] = 'x'
-                    playfield[i-1] = temporaryplayfieldline       
+                    playfieldline[ii] = backgroundsymbol
              
-
     
-    return(playfield)
+
+    return(playfield, balldirection)
     
 
 def main ():
@@ -258,14 +339,14 @@ def main ():
     
     # playfield [playfieldline[], playfieldline[], playfieldline[]...]
 
-    #ACTIVATE THIS DIRECTION FOR MOVEMENT TO BE CONTINUES
+
     direction = ''        
 
     i = 0
-    while i < 10:
+    while i < 212:
         i += 1
-
-
+        
+        
         while True:
             displaycmd(playfield)
             if msvcrt.kbhit():
@@ -282,11 +363,11 @@ def main ():
 
             else:
                 # character position updated or created
-                
                 characterupdate(playfield, direction)
+                ballupdate(playfield)
 
                 
-                ballupdate(playfield)
+                
 
                 
         #        print('')
@@ -313,5 +394,5 @@ main()
 
 print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC', ' value: ',                                 )
 
-# use for ball = u'\u03BF'
+# ball creation trigger new creation of player
 
