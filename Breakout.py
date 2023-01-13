@@ -3,10 +3,11 @@ import time
 
 def playfieldbackground():
     global backgroundsymbol
-    #ORIGINAL = u'\u2591' , blank = ' '
-    backgroundsymbol = u'\u2591'
-    #PLAYFIELDLINE MAX VALUE = [u'\u2591']*115
     global playfieldlinelen
+
+    #ORIGINAL = u'\u2591' , blank = u'\u2588'
+    backgroundsymbol = u'\u2591'
+    #PLAYFIELDLINE MAX VALUE = 115
     playfieldlinelen = 18
     playfieldline = [backgroundsymbol]*playfieldlinelen
     #PLAYGIELD HEIGHT DEFINED BY NUMBER OF LINES, OPTIMAL VALUE IS = [u'\u2591']*6, MAXIMAL VALUE IS = [u'\u2591']*28
@@ -38,48 +39,19 @@ def displaycmd(playfield):
     for i in playfield:
         strplayfieldline = ''.join(i)
         print(' ', strplayfieldline)
-    # SCREENTEARING ISSUE     
-    #
-    #        if  30 >= len(playfield):
-    #            strplayfield[0]
-    #            strplayfieldline = ''.join(i)
-    #            print(strplayfieldline)
-    #            strplayfield.append(strplayfieldline)
-    #            strcounter += 1
 
 
-    # 1. attemptint to avoid screen tearing by making 1 big print command
-    #   
-    #    print('\n\n\n   Breakout:\n \n', strplayfield[1], '\n', strplayfield[2], '\n', strplayfield[3], '\n', strplayfield[4], '\n', strplayfield[5], '\n', strplayfield[6], '\n', #strplayfield[7], '\n', strplayfield[8],)
-    #
-    #
-    # 2. attemptint to avoid screen tearing by relying on window width of cmd to put all prints at teh same time
-    #
-    #    print('\n\n\n', strplayfield[1],'                                                                                                                                                \
-    #            strplayfield[2], '                                                                                                                                                ',\
-    #            strplayfield[3], '                                                                                                                                                ',\
-    #            strplayfield[4], '                                                                                                                                                ',\
-    #            strplayfield[5], '                                                                                                                                                ',\
-    #            strplayfield[6], '                                                                                                                                                ',\
-    #            strplayfield[7], '                                                                                                                                                ',\
-    #            strplayfield[8],)
-
-
-
-def characterupdate(playfield, direction):
+def createplayer(playfield):
     global charactersymbol
+    global charactersize
+
     #ORIGINAL VALUE = u'\u2588'
     charactersymbol = u'\u2588'
     #MINIMUM VALUE = 1
     charactersize = 5
-
     # Sætter sidste linje i araet som spillerens position
     activelineofplayer = len(playfield) - 1
 
-    
-
-    
-    
     # set startingposition of player "creating player"
     if charactersymbol not in playfield[activelineofplayer]:
         i = 0
@@ -92,15 +64,25 @@ def characterupdate(playfield, direction):
             playfield[activelineofplayer].append(backgroundsymbol) 
             i += 1
 
-        
-        print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC',       '         character spawned'                        )    
         return(playfield)  
         
-        
-        
+
+def characterupdate(playfield, direction):
+    activelineofplayer = len(playfield) - 1
+
+    characterlive = True
+    for i in playfield[activelineofplayer]:
+        if i == charactersymbol:
+            characterlive = True
+            break
+        elif i != charactersymbol:
+            characterlive = False
+
+    if characterlive == False:
+        gamelive = False
 
     #player moves left 
-    elif direction == b'a':
+    if direction == b'a' and characterlive == True:
         # så længe spiller ikke er opped ad venstre væg
         if playfield[activelineofplayer].index(charactersymbol) != 0:
             # tag placering fra current playfield før overskrivning begynder
@@ -125,7 +107,7 @@ def characterupdate(playfield, direction):
 
 
     # player moves right
-    elif direction == b'd': 
+    elif direction == b'd' and characterlive == True: 
         # så længe spiller ikke er opped ad højre væg
         if playfield[activelineofplayer].index(charactersymbol) != len(playfield[0]) - charactersize:
             originalspaceofplayer = playfield[activelineofplayer].index(charactersymbol)
@@ -153,11 +135,25 @@ def characterupdate(playfield, direction):
     return playfield
 
 
-def ballupdate(playfield):
+def createball(playfield):
     #ORIGINAL VALUE = u'\u2588'
     global ballsymbol
     ballsymbol = u'\u03BF'
+    global ballalive
     ballalive = False
+
+    
+    playfield[-3] = [ballsymbol]
+    i = 0
+    while i < playfieldlinelen - 1:
+        playfield[-3].append(backgroundsymbol)
+        i += 1
+
+    global balldirection
+    balldirection = ['n', 'e']
+        
+
+def ballupdate(playfield):
 
     # checks if the ball symbol is already on the playingfield
     # taking each individuel line in playfield and assigns them to x, counting times loop is running to locate playfield[0]
@@ -172,56 +168,29 @@ def ballupdate(playfield):
                 ballpositionvertical = i
                 ballpositionhorizontal = x.index(ballsymbol)
                 break
-
-    # creating a ball at its spawn location if there is no ballsymbol detected on the playingfield
-    if ballalive == False:
-        print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC',       '         ball spawned'                        )
-        playfield[-3] = [ballsymbol]
-        i = 0
-        while i < playfieldlinelen - 1:
-            playfield[-3].append(backgroundsymbol)
-            i += 1
-        global balldirection
-        balldirection = ['n', 'e']
-        
-
-    #if ball is present, cordinates are send to functions needing location
-    if ballalive == True:
-        print('ballposition cord: ', ballpositionvertical, ballpositionhorizontal)
-    # detect collision and update placement of the ball dependent on direction
-        movementupdate(playfield, ballpositionvertical, ballpositionhorizontal)
-
-    return(playfield)
-
-        
-def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
-
-
-
     
-    #detect collision      MISSING
-    
+    #detect collision
     if playfield[-1][ballpositionhorizontal] == charactersymbol and ballpositionvertical == len(playfield) - 2:
         balldirection[0] = 'n'
 
 
-    #update direction of ball      MISSING
+    #update direction of ball
     if ballpositionhorizontal == playfieldlinelen - 1:
         balldirection[1] = 'w'
-        print('moving bk west')
 
-    #   NOT WORKING
+    #   CAREFUL - CREATING A STRING OF PLAYFIELD   
     if ballpositionvertical == len(playfield) - 1:
-        print('you lost')
-        # currently respawns player because of load order, overwriting ball, meaning a new ball gets spawned aswell as it is loaded afterwards
+        playfield[1] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, 'G', 'a', 'm', 'e', backgroundsymbol, 'o', 'v', 'e', 'r', '!', backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
+        playfield[2] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, "'", 'S', 'p', 'a', 'c', 'e', 'b', 'a', 'r', "'", backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
+        playfield[3] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, 't', 'o', backgroundsymbol, 't', 'r', 'y', backgroundsymbol, 'a', 'g', 'a', 'i', 'n', backgroundsymbol, backgroundsymbol, backgroundsymbol]
+        gamelive = False
+        return playfield
 
     if ballpositionhorizontal == 0:
         balldirection[1] = 'e'
-        print('moving bk east')
 
     if ballpositionvertical == 0:
         balldirection[0] = 's'
-        print('moving bk south')
     
     
 
@@ -232,9 +201,7 @@ def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
     # CODE CAN PROBABLY BE SHORTEND (pack all into 1 loop)
 
     #update placement of ball dependent on direction
-    print('balldirection: ', balldirection)
     if balldirection[0] == 'n' and balldirection[1] == 'e':  
-        print('ball going up and right')
         i = -1
         temporaryplayfieldline = []
         for playfieldline in playfield:
@@ -253,7 +220,6 @@ def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
                 break
 
     if balldirection[0] == 's' and balldirection[1] == 'e':  
-        print('ball going down and right')
         i = -1
         temporaryplayfieldline = []
         for playfieldline in playfield:
@@ -272,7 +238,6 @@ def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
                 break
 
     if balldirection[0] == 'n' and balldirection[1] == 'w':  
-        print('ball going up and left')
         i = -1
         temporaryplayfieldline = []
         for playfieldline in playfield:
@@ -291,7 +256,6 @@ def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
                 break
 
     if balldirection[0] == 's' and balldirection[1] == 'w':  
-        print('ball going down and left')
         i = -1
         temporaryplayfieldline = []
         for playfieldline in playfield:
@@ -325,41 +289,59 @@ def movementupdate(playfield, ballpositionvertical, ballpositionhorizontal):
                 if ii == ballpositionhorizontal and i == ballpositionvertical:
                     playfieldline[ii] = backgroundsymbol
              
+   
     
+    return(playfield)
 
-    return(playfield, balldirection)
-    
+      
+def blokcreation(playfield):
+    global bloksymbol
+    bloksymbol = 'M'
+    for i in playfield[0]:
+        if i != bloksymbol:
+            print('create bloks')
+
+
+def blokupdate(playfield):
+    print('bloks are live')
+
 
 def main ():
     input('\n         Hi\n   To reduce Screen\n      noise, pls\n   reduce the size\n    of the window\n    til this text\n     is centered\n\n')
     input('\n         Hi\n\n\n\n      Controls:\n        a & d\n     \n\n ')
     print('\n\n\n\n\n\n\n\n\n')
 
-
     
-    
+    global gamelive
     playfield = playfieldbackground()
-    
-    # playfield [playfieldline[], playfieldline[], playfieldline[]...]
+    createplayer(playfield)
+    createball(playfield)
+    blokcreation(playfield)
 
 
     direction = ''        
-
+    gamelive = True
     i = 0
     while i < 212:
         i += 1
         
         
-        while True:
+        while gamelive == True:
             displaycmd(playfield)
+            if gamelive == False:
+                break    
             if msvcrt.kbhit():
                 direction = msvcrt.getch()
-                if direction == b'a':
+                if direction == b'a' and gamelive == True:
                     characterupdate(playfield, direction)
                     break
 
-                elif direction == b'd':
+                elif direction == b'd'and gamelive == True:
                     characterupdate(playfield, direction)
+                    break
+
+                elif direction == b' ':
+                    main()
                     break
                 else:
                     break
@@ -368,8 +350,9 @@ def main ():
                 # character position updated or created
                 characterupdate(playfield, direction)
                 ballupdate(playfield)
-
                 
+                #dblokupdate(playfield)
+
                 
 
                 
@@ -381,21 +364,11 @@ def main ():
             break
 
 
-        time.sleep(0.1)
+        time.sleep(0.08)
     
 
-
-
-
-
-
-    input()
-    
 main()
 
 
-
 print(u'\u25EC', '  TROUBLE  TROUBLE  TROUBLE ', u'\u25EC', ' value: ',                                 )
-
-# ball creation trigger new creation of player
 
