@@ -7,10 +7,10 @@ def playfieldbackground():
 
     #ORIGINAL = u'\u2591' , blank = u'\u2588'
     backgroundsymbol = u'\u2591'
-    #PLAYFIELDLINE MAX VALUE = 115
+    #PLAYFIELDLINE RECOMENDED VALUE = 18
     playfieldlinelen = 18
     playfieldline = [backgroundsymbol]*playfieldlinelen
-    #PLAYGIELD HEIGHT DEFINED BY NUMBER OF LINES, OPTIMAL VALUE IS = [u'\u2591']*6, MAXIMAL VALUE IS = [u'\u2591']*28
+    #PLAYFIELD HEIGHT DEFINED BY NUMBER OF LINES, OPTIMAL VALUE IS = [u'\u2591']*6, MAXIMAL VALUE IS = [u'\u2591']*28
     playfield = ['']*6
 
     rowsofplayfieldlines = 0
@@ -24,15 +24,6 @@ def playfieldbackground():
 def displaycmd(playfield):
     #strplayfield = ['placeholder spot 0']
     #strcounter = 1
-
-    # test
-    for x in playfield:
-        print(x)
-    # test
-
-
-
-
 
     # SCREENTEARING ISSUE
     print('\n\n\n\n\n\n')
@@ -143,9 +134,10 @@ def createball(playfield):
     ballalive = False
 
     
-    playfield[-3] = [ballsymbol]
+    playfield[-3] = [backgroundsymbol]
+    playfield[-3].append(ballsymbol)
     i = 0
-    while i < playfieldlinelen - 1:
+    while i < playfieldlinelen - 2:
         playfield[-3].append(backgroundsymbol)
         i += 1
 
@@ -158,6 +150,7 @@ def ballupdate(playfield):
     # checks if the ball symbol is already on the playingfield
     # taking each individuel line in playfield and assigns them to x, counting times loop is running to locate playfield[0]
     i = - 1
+    ballalive = False
     for x in playfield:
         i += 1
         # takes each indvidual varaible of each individual line and assign them to y
@@ -169,141 +162,169 @@ def ballupdate(playfield):
                 ballpositionhorizontal = x.index(ballsymbol)
                 break
     
-    #detect collision
-    if playfield[-1][ballpositionhorizontal] == charactersymbol and ballpositionvertical == len(playfield) - 2:
-        balldirection[0] = 'n'
+    if ballalive == True:
+        #detect collision
+        if playfield[-1][ballpositionhorizontal] == charactersymbol and ballpositionvertical == len(playfield) - 2:
+            balldirection[0] = 'n'
+
+        if ballpositionvertical == 0 or playfield[ballpositionvertical -1][ballpositionhorizontal] != backgroundsymbol:
+            balldirection[0] = 's'
+            if playfield[ballpositionvertical -1][ballpositionhorizontal] == bloksymbol:
+                playfield[ballpositionvertical - 1][ballpositionhorizontal] = bloksymboltwo
+
+        #update direction of ball
+        if ballpositionhorizontal == playfieldlinelen - 1 or playfield[ballpositionvertical][ballpositionhorizontal + 1] != backgroundsymbol:
+            balldirection[1] = 'w'
+            print(ballpositionhorizontal, playfieldlinelen)
+            if ballpositionhorizontal < playfieldlinelen - 1:
+                if playfield[ballpositionvertical][ballpositionhorizontal + 1] == bloksymbol:
+                    playfield[ballpositionvertical][ballpositionvertical + 1] = bloksymboltwo
+
+        if ballpositionvertical == len(playfield) - 1:
+            playfield[1] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, 'G', 'a', 'm', 'e', backgroundsymbol, 'o', 'v', 'e', 'r', '!', backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
+            playfield[2] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, "'", 'S', 'p', 'a', 'c', 'e', 'b', 'a', 'r', "'", backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
+            playfield[3] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, 't', 'o', backgroundsymbol, 't', 'r', 'y', backgroundsymbol, 'a', 'g', 'a', 'i', 'n', backgroundsymbol, backgroundsymbol, backgroundsymbol]
+            gamelive = False
+            return playfield
+
+        if ballpositionhorizontal == 0 or playfield[ballpositionvertical][ballpositionhorizontal - 1] != backgroundsymbol:
+            balldirection[1] = 'e'
+            if ballpositionhorizontal <= playfieldlinelen:
+                if playfield[ballpositionvertical][ballpositionhorizontal - 1] == bloksymbol:
+                    playfield[ballpositionvertical][ballpositionvertical - 1] = bloksymboltwo
+
+        
+        
 
 
-    #update direction of ball
-    if ballpositionhorizontal == playfieldlinelen - 1:
-        balldirection[1] = 'w'
-
-    #   CAREFUL - CREATING A STRING OF PLAYFIELD   
-    if ballpositionvertical == len(playfield) - 1:
-        playfield[1] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, 'G', 'a', 'm', 'e', backgroundsymbol, 'o', 'v', 'e', 'r', '!', backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
-        playfield[2] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, "'", 'S', 'p', 'a', 'c', 'e', 'b', 'a', 'r', "'", backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
-        playfield[3] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, 't', 'o', backgroundsymbol, 't', 'r', 'y', backgroundsymbol, 'a', 'g', 'a', 'i', 'n', backgroundsymbol, backgroundsymbol, backgroundsymbol]
-        gamelive = False
-        return playfield
-
-    if ballpositionhorizontal == 0:
-        balldirection[1] = 'e'
-
-    if ballpositionvertical == 0:
-        balldirection[0] = 's'
     
-    
+        #update placement of ball dependent on direction
+        if balldirection[0] == 'n' and balldirection[1] == 'e':  
+            playfield[ballpositionvertical][ballpositionhorizontal] = ballsymbol
 
 
-    
 
-    
-    # CODE CAN PROBABLY BE SHORTEND (pack all into 1 loop)
+        
 
-    #update placement of ball dependent on direction
-    if balldirection[0] == 'n' and balldirection[1] == 'e':  
+        
+        # CODE CAN PROBABLY BE SHORTEND (pack all into 1 loop)
+
+        #update placement of ball dependent on direction
+        if balldirection[0] == 'n' and balldirection[1] == 'e':  
+            i = -1
+            temporaryplayfieldline = []
+            for playfieldline in playfield:
+                i += 1
+                #alters vertical position of ball: "-" equels up, "+" equals down
+                if i == ballpositionvertical - 1:
+                    for ii in range(len(playfieldline)):
+                    #alters horizontal position of ball: "-" equels left, "+" equals right
+                        if ii < ballpositionhorizontal + 1:
+                            temporaryplayfieldline.insert(0, backgroundsymbol)
+                        if ii == ballpositionhorizontal:
+                            temporaryplayfieldline.append(ballsymbol)
+                        if ii > ballpositionhorizontal + 1:
+                            temporaryplayfieldline.append(backgroundsymbol)
+                    playfield[i] = temporaryplayfieldline
+                    break
+
+        if balldirection[0] == 's' and balldirection[1] == 'e':  
+            i = -1
+            temporaryplayfieldline = []
+            for playfieldline in playfield:
+                i += 1
+                #alters vertical position of ball: "-" equels up, "+" equals down
+                if i == ballpositionvertical + 1:
+                    for ii in range(len(playfieldline)):
+                    #alters horizontal position of ball: "-" equels left, "+" equals right
+                        if ii < ballpositionhorizontal + 1:
+                            temporaryplayfieldline.insert(0, backgroundsymbol)
+                        if ii == ballpositionhorizontal:
+                            temporaryplayfieldline.append(ballsymbol)
+                        if ii > ballpositionhorizontal + 1:
+                            temporaryplayfieldline.append(backgroundsymbol)
+                    playfield[i] = temporaryplayfieldline
+                    break
+
+        if balldirection[0] == 'n' and balldirection[1] == 'w':  
+            i = -1
+            temporaryplayfieldline = []
+            for playfieldline in playfield:
+                i += 1
+                #alters vertical position of ball: "-" equels up, "+" equals down
+                if i == ballpositionvertical - 1:
+                    for ii in range(len(playfieldline)):
+                    #alters horizontal position of ball: "-" equels left, "+" equals right
+                        if ii < ballpositionhorizontal - 1:
+                            temporaryplayfieldline.insert(0, backgroundsymbol)
+                        if ii == ballpositionhorizontal:
+                            temporaryplayfieldline.append(ballsymbol)
+                        if ii > ballpositionhorizontal - 1:
+                            temporaryplayfieldline.append(backgroundsymbol)
+                    playfield[i] = temporaryplayfieldline
+                    break
+
+        if balldirection[0] == 's' and balldirection[1] == 'w':  
+            i = -1
+            temporaryplayfieldline = []
+            for playfieldline in playfield:
+                i += 1
+                #alters vertical position of ball: "-" equels up, "+" equals down
+                if i == ballpositionvertical + 1:
+                    for ii in range(len(playfieldline)):
+                    #alters horizontal position of ball: "-" equels left, "+" equals right
+                        if ii < ballpositionhorizontal - 1:
+                            temporaryplayfieldline.insert(0, backgroundsymbol)
+                        if ii == ballpositionhorizontal:
+                            temporaryplayfieldline.append(ballsymbol)
+                        if ii > ballpositionhorizontal - 1:
+                            temporaryplayfieldline.append(backgroundsymbol)
+                    playfield[i] = temporaryplayfieldline
+                    break
+        
+
+        #updating ball position regardles of direction
+        playfield[i] = temporaryplayfieldline       
+
+        # replaces(removes) ball from prevoious location   
         i = -1
-        temporaryplayfieldline = []
         for playfieldline in playfield:
+            # i is the number of current playfield list in int passes from 0 to 5
+            # playfieldline is the actual list
             i += 1
-            #alters vertical position of ball: "-" equels up, "+" equals down
-            if i == ballpositionvertical - 1:
+            if i == ballpositionvertical:
+                # ii is the variable in the current list of playfieldline, loop is needed to detect if ii is a certain object
                 for ii in range(len(playfieldline)):
-                #alters horizontal position of ball: "-" equels left, "+" equals right
-                    if ii < ballpositionhorizontal + 1:
-                        temporaryplayfieldline.insert(0, backgroundsymbol)
-                    if ii == ballpositionhorizontal:
-                        temporaryplayfieldline.append(ballsymbol)
-                    if ii > ballpositionhorizontal + 1:
-                        temporaryplayfieldline.append(backgroundsymbol)
-                playfield[i] = temporaryplayfieldline
-                break
-
-    if balldirection[0] == 's' and balldirection[1] == 'e':  
-        i = -1
-        temporaryplayfieldline = []
-        for playfieldline in playfield:
-            i += 1
-            #alters vertical position of ball: "-" equels up, "+" equals down
-            if i == ballpositionvertical + 1:
-                for ii in range(len(playfieldline)):
-                #alters horizontal position of ball: "-" equels left, "+" equals right
-                    if ii < ballpositionhorizontal + 1:
-                        temporaryplayfieldline.insert(0, backgroundsymbol)
-                    if ii == ballpositionhorizontal:
-                        temporaryplayfieldline.append(ballsymbol)
-                    if ii > ballpositionhorizontal + 1:
-                        temporaryplayfieldline.append(backgroundsymbol)
-                playfield[i] = temporaryplayfieldline
-                break
-
-    if balldirection[0] == 'n' and balldirection[1] == 'w':  
-        i = -1
-        temporaryplayfieldline = []
-        for playfieldline in playfield:
-            i += 1
-            #alters vertical position of ball: "-" equels up, "+" equals down
-            if i == ballpositionvertical - 1:
-                for ii in range(len(playfieldline)):
-                #alters horizontal position of ball: "-" equels left, "+" equals right
-                    if ii < ballpositionhorizontal - 1:
-                        temporaryplayfieldline.insert(0, backgroundsymbol)
-                    if ii == ballpositionhorizontal:
-                        temporaryplayfieldline.append(ballsymbol)
-                    if ii > ballpositionhorizontal - 1:
-                        temporaryplayfieldline.append(backgroundsymbol)
-                playfield[i] = temporaryplayfieldline
-                break
-
-    if balldirection[0] == 's' and balldirection[1] == 'w':  
-        i = -1
-        temporaryplayfieldline = []
-        for playfieldline in playfield:
-            i += 1
-            #alters vertical position of ball: "-" equels up, "+" equals down
-            if i == ballpositionvertical + 1:
-                for ii in range(len(playfieldline)):
-                #alters horizontal position of ball: "-" equels left, "+" equals right
-                    if ii < ballpositionhorizontal - 1:
-                        temporaryplayfieldline.insert(0, backgroundsymbol)
-                    if ii == ballpositionhorizontal:
-                        temporaryplayfieldline.append(ballsymbol)
-                    if ii > ballpositionhorizontal - 1:
-                        temporaryplayfieldline.append(backgroundsymbol)
-                playfield[i] = temporaryplayfieldline
-                break
-    
-
-    #updating ball position regardles of direction
-    playfield[i] = temporaryplayfieldline       
-
-    # replaces(removes) ball from prevoious location   
-    i = -1
-    for playfieldline in playfield:
-        # i is the number of current playfield list in int passes from 0 to 5
-        # playfieldline is the actual list
-        i += 1
-        if i == ballpositionvertical:
-            # ii is the variable in the current list of playfieldline, loop is needed to detect if ii is a certain object
-            for ii in range(len(playfieldline)):
-                if ii == ballpositionhorizontal and i == ballpositionvertical:
-                    playfieldline[ii] = backgroundsymbol
-             
-   
-    
+                    if ii == ballpositionhorizontal and i == ballpositionvertical:
+                        playfieldline[ii] = backgroundsymbol
+        
     return(playfield)
 
       
 def blokcreation(playfield):
     global bloksymbol
-    bloksymbol = 'M'
+    global bloksymboltwo
+
+    #  = u'\u2592' or  = u'\u2593'
+    bloksymbol = u'\u2592'
+    bloksymboltwo = charactersymbol
+    playfield[0] = [bloksymbol] * playfieldlinelen
+    return playfield
+
+
+def checkwin(playfield):
+
     for i in playfield[0]:
-        if i != bloksymbol:
-            print('create bloks')
-
-
-def blokupdate(playfield):
-    print('bloks are live')
+        if i == bloksymbol:
+            winstate = False
+            break
+        else:
+            winstate = True
+    if winstate == True:
+            playfield[1] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, 'Y', 'o', 'u', backgroundsymbol, 'w', 'i', 'n', '!', backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
+            playfield[2] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol, "'", 'S', 'p', 'a', 'c', 'e', 'b', 'a', 'r', "'", backgroundsymbol, backgroundsymbol, backgroundsymbol, backgroundsymbol]
+            playfield[3] = [backgroundsymbol, backgroundsymbol, backgroundsymbol, 't', 'o', backgroundsymbol, 't', 'r', 'y', backgroundsymbol, 'a', 'g', 'a', 'i', 'n', backgroundsymbol, backgroundsymbol, backgroundsymbol]
+            gamelive = False
 
 
 def main ():
@@ -322,7 +343,7 @@ def main ():
     direction = ''        
     gamelive = True
     i = 0
-    while i < 212:
+    while i < 25:
         i += 1
         
         
@@ -350,6 +371,7 @@ def main ():
                 # character position updated or created
                 characterupdate(playfield, direction)
                 ballupdate(playfield)
+                checkwin(playfield)
                 
                 #dblokupdate(playfield)
 
